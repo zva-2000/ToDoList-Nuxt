@@ -1,6 +1,13 @@
+<script setup lang="ts">
+import AppShell from './components/common/AppShell.vue';
+
+</script>
+
 <template>
-  <div>
+  <div class="app">
     <NuxtRouteAnnouncer />
-    <NuxtWelcome />
+    <AppShell>
+      <NuxtPage />
+    </AppShell>
   </div>
 </template>
