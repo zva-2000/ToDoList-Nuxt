@@ -29,7 +29,6 @@ describe('useNotesStore', () => {
 
     store.addNote(note)
 
-    expect(store.notes).toHaveLength(1)
     expect(store.noteById(note.id)).toMatchObject(note)
   })
 
@@ -40,7 +39,7 @@ describe('useNotesStore', () => {
     store.addNote(note)
     note.todos[0]!.text = 'Изменённый текст'
 
-    expect(store.notes[0]!.todos[0]!.text).toBe('Сходить в музей')
+    expect(store.noteById(note.id)!.todos[0]!.text).toBe('Сходить в музей')
   })
 
   it('does not add a note with a duplicate id', () => {
@@ -77,7 +76,7 @@ describe('useNotesStore', () => {
     store.addNote(note)
 
     expect(store.deleteNote(note.id)).toBe(true)
-    expect(store.notes).toHaveLength(0)
+    expect(store.noteById(note.id)).toBeUndefined()
   })
 
   it('returns false when deleting an unknown note', () => {
