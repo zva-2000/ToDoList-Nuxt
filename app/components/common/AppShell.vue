@@ -1,3 +1,7 @@
+<script setup lang="ts">
+import { NuxtLink } from '#components'
+</script>
+
 <template>
   <div class="shell">
     <header class="shell__header">
