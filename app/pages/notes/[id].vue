@@ -10,10 +10,13 @@ definePageMeta({
   key: (route) => route.fullPath
 })
 
+const NEW_NOTE_ID = 'new'
+
 const route = useRoute()
 const notesStore = useNotesStore()
 const noteId = typeof route.params.id === 'string' ? route.params.id : ''
-const storedNote = computed(() => notesStore.noteById(noteId))
+const isNewNote = noteId === NEW_NOTE_ID
+const storedNote = computed(() => (isNewNote ? undefined : notesStore.noteById(noteId)))
 const initialNote = storedNote.value
 const editor = useNoteEditor({ initialNote, routeKey: noteId })
 const {
@@ -28,16 +31,35 @@ const isDeleteConfirmOpen = ref(false)
 const wasDeletedElsewhere = ref(false)
 let isDeletingHere = false
 
+const isEditorVisible = computed(() => isNewNote || (Boolean(initialNote) && !wasDeletedElsewhere.value))
+
+const pageTitle = computed(() => {
+  if (isNewNote) {
+    return 'Новая заметка'
+  }
+
+  return editor.note.title || 'Редактирование заметки'
+})
+
 watch(storedNote, (note) => {
   if (initialNote && !note && !isDeletingHere) {
     wasDeletedElsewhere.value = true
     isCancelConfirmOpen.value = false
     isDeleteConfirmOpen.value = false
+    editor.cancel()
+    editor.discardDraft()
+  }
+})
+
+onMounted(() => {
+  if (!isNewNote && !initialNote) {
+    editor.cancel()
+    editor.discardDraft()
   }
 })
 
 async function saveNote(): Promise<void> {
-  if (!storedNote.value) {
+  if (!isNewNote && !storedNote.value) {
     wasDeletedElsewhere.value = true
     return
   }
@@ -49,7 +71,12 @@ async function saveNote(): Promise<void> {
     return
   }
 
-  notesStore.updateNote(note)
+  if (isNewNote) {
+    notesStore.addNote(note)
+  } else {
+    notesStore.updateNote(note)
+  }
+
   await goToList()
 }
 
@@ -63,16 +90,18 @@ async function deleteNote(): Promise<void> {
 </script>
 
 <template>
-  <section v-if="initialNote && !wasDeletedElsewhere" aria-labelledby="edit-note-title">
+  <section v-if="isEditorVisible" aria-labelledby="edit-note-title">
     <PageHeader
       title-id="edit-note-title"
-      :title="editor.note.title || 'Редактирование заметки'"
-      description="Измените название или задачи и сохраните результат."
+      :title="pageTitle"
+      :description="isNewNote
+        ? 'Добавьте название и задачи, затем сохраните заметку.'
+        : 'Измените название или задачи и сохраните результат.'"
     />
 
     <NoteEditor
       :editor="editor"
-      show-delete
+      :show-delete="!isNewNote"
       @save="saveNote"
       @cancel="requestCancel"
       @delete="isDeleteConfirmOpen = true"
@@ -81,9 +110,11 @@ async function deleteNote(): Promise<void> {
     <ConfirmModal
       :model-value="editor.restorableDraft !== null"
       title="Восстановить черновик?"
-      description="Найдены несохранённые изменения этой заметки."
+      :description="isNewNote
+        ? 'Найдены несохранённые изменения предыдущей сессии.'
+        : 'Найдены несохранённые изменения этой заметки.'"
       confirm-label="Восстановить"
-      cancel-label="Продолжить без него"
+      :cancel-label="isNewNote ? 'Начать заново' : 'Продолжить без него'"
       confirm-variant="primary"
       @confirm="editor.restoreDraft"
       @cancel="editor.discardDraft"
@@ -91,14 +122,15 @@ async function deleteNote(): Promise<void> {
 
     <ConfirmModal
       v-model="isCancelConfirmOpen"
-      title="Отменить редактирование?"
+      :title="isNewNote ? 'Отменить создание заметки?' : 'Отменить редактирование?'"
       description="Все несохранённые изменения будут удалены."
-      confirm-label="Отменить"
+      :confirm-label="isNewNote ? 'Удалить черновик' : 'Отменить'"
       cancel-label="Продолжить"
       @confirm="leaveWithoutSaving"
     />
 
     <ConfirmModal
+      v-if="!isNewNote"
       v-model="isDeleteConfirmOpen"
       title="Удалить заметку?"
       description="Заметка и все её задачи будут удалены. Это действие нельзя отменить."

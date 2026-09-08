@@ -9,6 +9,14 @@ export function useNoteDraft(routeKey: string) {
   const restorable = shallowRef<Note | null>(null)
   let writer: NoteDraftWriter | null = null
 
+  if (import.meta.client) {
+    const stored = readStoredDraft(window.localStorage)
+
+    if (stored && stored.routeKey === routeKey) {
+      restorable.value = stored.note
+    }
+  }
+
   function schedule(note: Note): void {
     writer?.schedule({ routeKey, note })
   }
@@ -33,13 +41,6 @@ export function useNoteDraft(routeKey: string) {
 
   onMounted(() => {
     writer = createNoteDraftWriter(window.localStorage)
-
-    const stored = readStoredDraft(window.localStorage)
-
-    if (stored && stored.routeKey === routeKey) {
-      restorable.value = stored.note
-    }
-
     window.addEventListener('pagehide', flush)
     document.addEventListener('visibilitychange', flushWhenHidden)
   })

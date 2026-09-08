@@ -107,6 +107,8 @@ describe('note history', () => {
 
     expect(history.past).toHaveLength(50)
     expect(history.past[0]).toMatchObject({ previous: '5', next: '6' })
+    expect(history.past.every((operation: any) => !('note' in operation))).toBe(true)
+    expect(history.past.every((operation: any) => !('todos' in operation))).toBe(true)
   })
 
   it('stores its own todo snapshot and can be cleared', () => {

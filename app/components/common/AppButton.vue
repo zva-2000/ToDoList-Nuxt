@@ -8,9 +8,11 @@ const props = withDefaults(defineProps<{
   to?: string
   type?: ButtonType
   variant?: ButtonVariant
+  disabled?: boolean
   ariaLabel?: string
 }>(), {
   ariaLabel: '',
+  disabled: false,
   to: '',
   type: 'button',
   variant: 'primary'
@@ -36,6 +38,7 @@ defineOptions({ inheritAttrs: false })
     class="app-button"
     :class="`app-button--${props.variant}`"
     :type="props.type"
+    :disabled="props.disabled"
     :aria-label="props.ariaLabel || undefined"
   >
     <slot />

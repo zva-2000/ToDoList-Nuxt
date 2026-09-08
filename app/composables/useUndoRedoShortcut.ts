@@ -1,24 +1,28 @@
+import {
+  getHistoryShortcut,
+  shouldUseNativeFieldHistory
+} from '~/utils/historyShortcut'
+
 interface UndoRedoActions {
   undo(): boolean
   redo(): boolean
 }
 
-function isTextEntry(target: EventTarget | null): boolean {
-  return target instanceof HTMLElement
-    && (target.matches('input, textarea') || target.isContentEditable)
-}
-
 export function useUndoRedoShortcut(actions: UndoRedoActions): void {
   function onKeydown(event: KeyboardEvent): void {
-    const isHistoryShortcut = event.key.toLowerCase() === 'z'
-      && (event.ctrlKey || event.metaKey)
-      && !event.altKey
+    const shortcut = getHistoryShortcut(event)
 
-    if (!isHistoryShortcut || isTextEntry(event.target)) {
+    if (
+      shortcut === null
+      || shouldUseNativeFieldHistory(event.target)
+      || document.querySelector('[role="dialog"]')
+    ) {
       return
     }
 
-    if (event.shiftKey ? actions.redo() : actions.undo()) {
+    const applied = shortcut === 'redo' ? actions.redo() : actions.undo()
+
+    if (applied) {
       event.preventDefault()
     }
   }

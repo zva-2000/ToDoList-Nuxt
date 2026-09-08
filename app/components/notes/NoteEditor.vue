@@ -26,13 +26,21 @@ defineEmits<{
       label="Название заметки"
       :error="editor.titleError"
       autocomplete="off"
-      autofocus
+      :autofocus="!editor.restorableDraft"
       placeholder="Например, планы на выходные"
       @update:model-value="editor.updateTitle"
       @blur="editor.finishTextEdit"
     />
 
-    <TodoEditorList :editor="editor" />
+    <TodoEditorList
+      :todos="editor.note.todos"
+      :invalid-todo-ids="editor.invalidTodoIds"
+      @add="editor.addTodo"
+      @update:text="editor.updateTodoText"
+      @blur-text="editor.finishTextEdit"
+      @toggle="editor.toggleTodo"
+      @remove="editor.removeTodo"
+    />
 
     <footer class="note-editor__actions">
       <div class="note-editor__history">
@@ -43,6 +51,7 @@ defineEmits<{
           :disabled="!editor.canUndo"
           aria-label="Шаг назад"
           title="Шаг назад — Ctrl или Cmd + Z"
+          @mousedown.prevent
           @click="editor.undo"
         >
           <svg aria-hidden="true" viewBox="0 0 24 24">
@@ -56,6 +65,7 @@ defineEmits<{
           :disabled="!editor.canRedo"
           aria-label="Шаг вперёд"
           title="Шаг вперёд — Ctrl или Cmd + Shift + Z"
+          @mousedown.prevent
           @click="editor.redo"
         >
           <svg aria-hidden="true" viewBox="0 0 24 24">

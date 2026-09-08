@@ -21,7 +21,12 @@ const hiddenTodosCount = computed(() => Math.max(props.todos.length - visibleTod
         class="todo-preview__item"
         :class="{ 'todo-preview__item--completed': todo.completed }"
       >
-        {{ todo.text }}
+        <span
+          class="todo-preview__check"
+          :class="{ 'todo-preview__check--completed': todo.completed }"
+          aria-hidden="true"
+        />
+        <span class="todo-preview__item-text">{{ todo.text }}</span>
       </li>
     </ul>
     <p v-else class="todo-preview__empty">Нет задач</p>
@@ -41,26 +46,39 @@ const hiddenTodosCount = computed(() => Math.max(props.todos.length - visibleTod
 }
 
 .todo-preview__item {
-  position: relative;
-  padding-left: 0.875rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.625rem;
   color: $color-text;
   line-height: 1.4;
+}
 
-  &::before {
-    content: '';
-    position: absolute;
-    top: 0.5em;
-    left: 0;
-    width: 0.3125rem;
-    height: 0.3125rem;
-    border-radius: 50%;
-    background-color: $color-text;
-  }
+.todo-preview__check {
+  flex-shrink: 0;
+  width: 1rem;
+  height: 1rem;
+  margin-top: 0.125rem;
+  border: 1px solid $color-border-strong;
+  border-radius: 0.25rem;
+  background-color: $color-surface;
+  pointer-events: none;
+}
+
+.todo-preview__check--completed {
+  border-color: $color-accent;
+  background-color: $color-accent;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23fff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m3.5 8.5 3 3 6-7'/%3E%3C/svg%3E");
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 0.75rem;
 }
 
 .todo-preview__item--completed {
   color: $color-text-muted;
-  text-decoration: line-through;
+
+  .todo-preview__item-text {
+    text-decoration: line-through;
+  }
 }
 
 .todo-preview__empty,

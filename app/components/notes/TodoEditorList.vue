@@ -2,12 +2,22 @@
 import AppButton from '~/components/common/AppButton.vue'
 import AppTextField from '~/components/common/AppTextField.vue'
 import TodoEditorItem from './TodoEditorItem.vue'
-import type { NoteEditorController } from '~/types/editor'
+import type { Todo } from '~/types/notes'
+import { NEW_TODO_FIELD_ID } from '~/utils/historyShortcut'
 
 const TODO_REQUIRED_ERROR = 'Введите текст задачи.'
 
-const props = defineProps<{
-  editor: NoteEditorController
+defineProps<{
+  todos: readonly Todo[]
+  invalidTodoIds: readonly string[]
+}>()
+
+const emit = defineEmits<{
+  add: [text: string]
+  'blur-text': []
+  remove: [todoId: string]
+  toggle: [todoId: string]
+  'update:text': [todoId: string, value: string]
 }>()
 
 const newTodoText = ref('')
@@ -26,13 +36,13 @@ function addTodo(): void {
     return
   }
 
-  props.editor.addTodo(text)
+  emit('add', text)
   newTodoText.value = ''
   newTodoError.value = ''
 }
 
-function todoError(todoId: string): string {
-  return props.editor.invalidTodoIds.includes(todoId) ? TODO_REQUIRED_ERROR : ''
+function todoError(todoId: string, invalidTodoIds: readonly string[]): string {
+  return invalidTodoIds.includes(todoId) ? TODO_REQUIRED_ERROR : ''
 }
 </script>
 
@@ -40,9 +50,9 @@ function todoError(todoId: string): string {
   <section class="todo-editor" aria-labelledby="todo-editor-title">
     <h2 id="todo-editor-title" class="todo-editor__title">Задачи</h2>
 
-    <form class="todo-editor__add" @submit.prevent="addTodo">
+    <div class="todo-editor__add">
       <AppTextField
-        id="new-todo"
+        :id="NEW_TODO_FIELD_ID"
         :model-value="newTodoText"
         label="Новая задача"
         visually-hide-label
@@ -55,25 +65,26 @@ function todoError(todoId: string): string {
       />
       <AppButton
         class="todo-editor__add-button"
-        type="submit"
+        type="button"
         aria-label="Добавить задачу"
         title="Добавить задачу"
+        @click="addTodo"
       >
         <span aria-hidden="true">+</span>
       </AppButton>
-    </form>
+    </div>
 
-    <ul v-if="editor.note.todos.length" class="todo-editor__list">
+    <ul v-if="todos.length" class="todo-editor__list">
       <TodoEditorItem
-        v-for="(todo, index) in editor.note.todos"
+        v-for="(todo, index) in todos"
         :key="todo.id"
         :todo="todo"
         :index="index"
-        :error="todoError(todo.id)"
-        @update:text="editor.updateTodoText(todo.id, $event)"
-        @blur="editor.finishTextEdit()"
-        @toggle="editor.toggleTodo(todo.id)"
-        @remove="editor.removeTodo(todo.id)"
+        :error="todoError(todo.id, invalidTodoIds)"
+        @update:text="emit('update:text', todo.id, $event)"
+        @blur="emit('blur-text')"
+        @toggle="emit('toggle', todo.id)"
+        @remove="emit('remove', todo.id)"
       />
     </ul>
 
