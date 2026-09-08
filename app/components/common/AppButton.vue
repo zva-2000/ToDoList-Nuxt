@@ -44,6 +44,7 @@ defineOptions({ inheritAttrs: false })
 
 <style lang="scss" scoped>
 @use '~/assets/scss/tokens' as *;
+@use '~/assets/scss/mixins' as *;
 
 .app-button {
   display: inline-flex;
@@ -57,13 +58,23 @@ defineOptions({ inheritAttrs: false })
   line-height: 1.25;
   text-decoration: none;
   transition: background-color 0.15s ease, border-color 0.15s ease;
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
 }
 
 .app-button--primary {
   background-color: $color-accent;
   color: $color-surface;
 
-  &:hover {
+  &:hover,
+  &:focus-visible {
     background-color: #394cc3;
   }
 }
@@ -73,8 +84,10 @@ defineOptions({ inheritAttrs: false })
   background-color: $color-surface;
   color: $color-text;
 
-  &:hover {
-    background-color: $color-page;
+  &:hover,
+  &:focus-visible {
+    border-color: $color-accent;
+    background-color: $color-border;
   }
 }
 
@@ -82,7 +95,8 @@ defineOptions({ inheritAttrs: false })
   background-color: $color-danger;
   color: $color-surface;
 
-  &:hover {
+  &:hover,
+  &:focus-visible {
     background-color: $color-danger-hover;
   }
 }

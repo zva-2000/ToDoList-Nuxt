@@ -10,17 +10,12 @@ const FOCUSABLE_SELECTOR = [
 
 const props = withDefaults(defineProps<{
   modelValue: boolean
-  title?: string
+  title: string
   description?: string
   closeOnBackdrop?: boolean
-  labelledBy?: string
-  describedBy?: string
 }>(), {
   closeOnBackdrop: true,
-  description: '',
-  describedBy: '',
-  labelledBy: '',
-  title: ''
+  description: ''
 })
 
 const emit = defineEmits<{
@@ -33,21 +28,11 @@ const titleId = useId()
 const descriptionId = useId()
 const rootRef = ref<HTMLElement | null>(null)
 const panelRef = ref<HTMLElement | null>(null)
-const activatorRef = ref<HTMLElement | null>(null)
-const previousBodyOverflow = ref('')
 
-const resolvedLabelledBy = computed(() => props.labelledBy || titleId)
-const resolvedDescribedBy = computed(() => {
-  if (props.describedBy) {
-    return props.describedBy
-  }
+const describedBy = computed(() => (props.description || slots.default ? descriptionId : undefined))
 
-  if (props.description || slots.default) {
-    return descriptionId
-  }
-
-  return undefined
-})
+let activator: HTMLElement | null = null
+let previousBodyOverflow = ''
 
 function isVisible(element: HTMLElement): boolean {
   return !!(element.offsetWidth || element.offsetHeight || element.getClientRects().length)
@@ -62,7 +47,7 @@ function getFocusableElements(): HTMLElement[] {
     .filter((element) => element.tabIndex >= 0 && isVisible(element))
 }
 
-function focusElement(element: HTMLElement | null): void {
+function focusElement(element: HTMLElement | null | undefined): void {
   element?.focus({ preventScroll: true })
 }
 
@@ -77,24 +62,16 @@ function resolveInitialFocus(): HTMLElement | null {
 }
 
 function restoreFocus(): void {
-  const activator = activatorRef.value
-  activatorRef.value = null
+  const previouslyFocused = activator
+  activator = null
 
   requestAnimationFrame(() => {
-    if (activator && document.contains(activator)) {
-      focusElement(activator)
+    if (previouslyFocused && document.contains(previouslyFocused)) {
+      focusElement(previouslyFocused)
       return
     }
 
-    const fallback = document.querySelector<HTMLElement>('main h1, .page-header__title, .empty-state__title')
-
-    if (fallback) {
-      if (fallback.tabIndex < 0) {
-        fallback.tabIndex = -1
-      }
-
-      focusElement(fallback)
-    }
+    focusElement(document.querySelector<HTMLElement>('main h1'))
   })
 }
 
@@ -107,13 +84,13 @@ function setBackgroundInert(inert: boolean): void {
 }
 
 function lockPage(): void {
-  previousBodyOverflow.value = document.body.style.overflow
+  previousBodyOverflow = document.body.style.overflow
   document.body.style.overflow = 'hidden'
   setBackgroundInert(true)
 }
 
 function unlockPage(): void {
-  document.body.style.overflow = previousBodyOverflow.value
+  document.body.style.overflow = previousBodyOverflow
   setBackgroundInert(false)
 }
 
@@ -153,18 +130,19 @@ function onKeydown(event: KeyboardEvent): void {
   }
 
   const first = focusableElements[0]
-  const last = focusableElements[focusableElements.length - 1]
+  const last = focusableElements.at(-1)
   const activeElement = document.activeElement
+  const isLeavingTrap = !panelRef.value?.contains(activeElement)
 
-  if (event.shiftKey && (activeElement === first || !panelRef.value?.contains(activeElement))) {
+  if (event.shiftKey && (activeElement === first || isLeavingTrap)) {
     event.preventDefault()
-    focusElement(last ?? null)
+    focusElement(last)
     return
   }
 
-  if (!event.shiftKey && (activeElement === last || !panelRef.value?.contains(activeElement))) {
+  if (!event.shiftKey && (activeElement === last || isLeavingTrap)) {
     event.preventDefault()
-    focusElement(first ?? null)
+    focusElement(first)
   }
 }
 
@@ -194,7 +172,7 @@ function unbindGlobalEvents(): void {
 
 async function openModal(): Promise<void> {
   const activeElement = document.activeElement
-  activatorRef.value = activeElement instanceof HTMLElement ? activeElement : null
+  activator = activeElement instanceof HTMLElement ? activeElement : null
   lockPage()
   await nextTick()
   focusElement(resolveInitialFocus())
@@ -242,15 +220,11 @@ onBeforeUnmount(() => {
         class="app-modal__panel"
         role="dialog"
         aria-modal="true"
-        :aria-labelledby="resolvedLabelledBy"
-        :aria-describedby="resolvedDescribedBy"
+        :aria-labelledby="titleId"
+        :aria-describedby="describedBy"
         tabindex="-1"
       >
-        <div class="app-modal__header">
-          <h2 :id="titleId" class="app-modal__title">
-            <slot name="title">{{ title }}</slot>
-          </h2>
-        </div>
+        <h2 :id="titleId" class="app-modal__title">{{ title }}</h2>
         <div :id="descriptionId" class="app-modal__body">
           <slot>
             <p v-if="description" class="app-modal__description">{{ description }}</p>

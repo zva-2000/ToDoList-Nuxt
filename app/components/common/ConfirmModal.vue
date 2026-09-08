@@ -1,16 +1,17 @@
 <script setup lang="ts">
-import { AppButton, 
-  AppModal } from '~/components/common'
+import { AppButton, AppModal } from '~/components/common'
 
-const props = withDefaults(defineProps<{
+withDefaults(defineProps<{
   modelValue: boolean
   title: string
   description: string
   confirmLabel?: string
   cancelLabel?: string
+  confirmVariant?: 'primary' | 'danger'
 }>(), {
   cancelLabel: 'Отмена',
-  confirmLabel: 'Удалить'
+  confirmLabel: 'Удалить',
+  confirmVariant: 'danger'
 })
 
 const emit = defineEmits<{
@@ -48,7 +49,7 @@ function onConfirm(): void {
         {{ cancelLabel }}
       </AppButton>
       <AppButton
-        variant="danger"
+        :variant="confirmVariant"
         @click="onConfirm"
       >
         {{ confirmLabel }}

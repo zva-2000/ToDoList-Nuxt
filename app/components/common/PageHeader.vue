@@ -1,14 +1,23 @@
 <script setup lang="ts">
-defineProps<{
+const props = withDefaults(defineProps<{
   title: string
   description: string
-}>()
+  titleId?: string
+}>(), {
+  titleId: ''
+})
 </script>
 
 <template>
   <header class="page-header">
     <div>
-      <h1 class="page-header__title" tabindex="-1">{{ title }}</h1>
+      <h1
+        :id="props.titleId || undefined"
+        class="page-header__title"
+        tabindex="-1"
+      >
+        {{ title }}
+      </h1>
       <p class="page-header__description">{{ description }}</p>
     </div>
     <div v-if="$slots.actions" class="page-header__actions">

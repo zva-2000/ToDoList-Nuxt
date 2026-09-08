@@ -3,12 +3,14 @@ defineProps<{
   title: string
   description: string
 }>()
+
+const titleId = useId()
 </script>
 
 <template>
-  <section class="empty-state" aria-labelledby="empty-state-title">
+  <section class="empty-state" :aria-labelledby="titleId">
     <div class="empty-state__icon" aria-hidden="true">+</div>
-    <h1 id="empty-state-title" class="empty-state__title" tabindex="-1">{{ title }}</h1>
+    <h1 :id="titleId" class="empty-state__title" tabindex="-1">{{ title }}</h1>
     <p class="empty-state__description">{{ description }}</p>
     <div v-if="$slots.actions" class="empty-state__actions">
       <slot name="actions" />
