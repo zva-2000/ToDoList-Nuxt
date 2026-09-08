@@ -1,6 +1,9 @@
 <script setup lang="ts">
-import { AppButton, ConfirmModal, EmptyState, PageHeader } from '~/components/common'
-import { NotesList } from '~/components/notes'
+import AppButton from '~/components/common/AppButton.vue'
+import ConfirmModal from '~/components/common/ConfirmModal.vue'
+import EmptyState from '~/components/common/EmptyState.vue'
+import PageHeader from '~/components/common/PageHeader.vue'
+import NotesList from '~/components/notes/NotesList.vue'
 import { useNotesStore } from '~/stores/notes'
 import type { Note } from '~/types/notes'
 

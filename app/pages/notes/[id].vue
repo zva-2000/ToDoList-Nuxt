@@ -1,6 +1,9 @@
 <script setup lang="ts">
-import { AppButton, ConfirmModal, EmptyState, PageHeader } from '~/components/common'
-import { NoteEditor } from '~/components/notes'
+import AppButton from '~/components/common/AppButton.vue'
+import ConfirmModal from '~/components/common/ConfirmModal.vue'
+import EmptyState from '~/components/common/EmptyState.vue'
+import PageHeader from '~/components/common/PageHeader.vue'
+import NoteEditor from '~/components/notes/NoteEditor.vue'
 import { useNotesStore } from '~/stores/notes'
 
 definePageMeta({
@@ -90,8 +93,8 @@ async function deleteNote(): Promise<void> {
       v-model="isCancelConfirmOpen"
       title="Отменить редактирование?"
       description="Все несохранённые изменения будут удалены."
-      confirm-label="Отменить редактирование"
-      cancel-label="Продолжить редактирование"
+      confirm-label="Отменить"
+      cancel-label="Продолжить"
       @confirm="leaveWithoutSaving"
     />
 

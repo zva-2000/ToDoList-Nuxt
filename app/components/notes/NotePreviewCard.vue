@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { NuxtLink } from '#components'
-import { AppButton } from '~/components/common'
-import { TodoPreview } from '~/components/notes'
+import AppButton from '~/components/common/AppButton.vue'
+import TodoPreview from './TodoPreview.vue'
 import type { Note } from '~/types/notes'
 
 defineProps<{
@@ -39,9 +39,11 @@ defineEmits<{
 
 .note-card {
   display: flex;
+  min-width: 0;
   min-height: 100%;
   flex-direction: column;
   padding: 1.25rem;
+  overflow-wrap: anywhere;
   border: 1px solid $color-border;
   border-radius: $radius-large;
   background-color: $color-surface;

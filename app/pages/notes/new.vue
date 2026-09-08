@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { ConfirmModal, PageHeader } from '~/components/common'
-import { NoteEditor } from '~/components/notes'
+import ConfirmModal from '~/components/common/ConfirmModal.vue'
+import PageHeader from '~/components/common/PageHeader.vue'
+import NoteEditor from '~/components/notes/NoteEditor.vue'
 import { useNotesStore } from '~/stores/notes'
 
 const notesStore = useNotesStore()
@@ -56,7 +57,7 @@ async function saveNote(): Promise<void> {
       title="Отменить создание заметки?"
       description="Все несохранённые изменения будут удалены."
       confirm-label="Удалить черновик"
-      cancel-label="Продолжить редактирование"
+      cancel-label="Продолжить"
       @confirm="leaveWithoutSaving"
     />
   </section>

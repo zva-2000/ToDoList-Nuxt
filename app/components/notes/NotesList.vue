@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { NotePreviewCard } from '~/components/notes'
+import NotePreviewCard from './NotePreviewCard.vue'
 import type { Note } from '~/types/notes'
 
 defineProps<{
@@ -31,6 +31,10 @@ const emit = defineEmits<{
   margin: 0;
   padding: 0;
   list-style: none;
+}
+
+.notes-list > li {
+  min-width: 0;
 }
 
 @media (min-width: $breakpoint-tablet) {

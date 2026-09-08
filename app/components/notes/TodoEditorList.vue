@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { AppButton, AppTextField } from '~/components/common'
-import { TodoEditorItem } from '~/components/notes'
+import AppButton from '~/components/common/AppButton.vue'
+import AppTextField from '~/components/common/AppTextField.vue'
+import TodoEditorItem from './TodoEditorItem.vue'
 import type { NoteEditorController } from '~/types/editor'
 
 const TODO_REQUIRED_ERROR = 'Введите текст задачи.'

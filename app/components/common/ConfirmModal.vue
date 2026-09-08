@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { AppButton, AppModal } from '~/components/common'
+import AppButton from './AppButton.vue'
+import AppModal from './AppModal.vue'
 
 withDefaults(defineProps<{
   modelValue: boolean

@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { AppButton, AppTextField } from '~/components/common'
+import AppButton from '~/components/common/AppButton.vue'
+import AppTextField from '~/components/common/AppTextField.vue'
 import type { Todo } from '~/types/notes'
 
 defineProps<{

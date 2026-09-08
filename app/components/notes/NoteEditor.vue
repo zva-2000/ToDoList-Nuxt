@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { AppButton, AppTextField } from '~/components/common'
-import { TodoEditorList } from '~/components/notes'
+import AppButton from '~/components/common/AppButton.vue'
+import AppTextField from '~/components/common/AppTextField.vue'
+import TodoEditorList from './TodoEditorList.vue'
 import type { NoteEditorController } from '~/types/editor'
 
 withDefaults(defineProps<{
