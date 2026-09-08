@@ -23,6 +23,23 @@ describe('useNotesStore', () => {
     setActivePinia(createPinia())
   })
 
+  it('starts with an empty list before hydration', () => {
+    const store = useNotesStore()
+
+    expect(store.notes).toEqual([])
+  })
+
+  it('replaces notes during hydration without keeping input references', () => {
+    const store = useNotesStore()
+    const note = createNote()
+
+    store.replaceNotes([note])
+    note.title = 'Изменено снаружи'
+    note.todos[0]!.text = 'Изменённая задача'
+
+    expect(store.noteById('note-1')).toEqual(createNote())
+  })
+
   it('adds a note and finds it by id', () => {
     const store = useNotesStore()
     const note = createNote()
@@ -62,6 +79,17 @@ describe('useNotesStore', () => {
 
     expect(store.updateNote(updated)).toBe(true)
     expect(store.noteById(updated.id)).toMatchObject(updated)
+  })
+
+  it('does not keep a reference to the edited note', () => {
+    const store = useNotesStore()
+    store.addNote(createNote())
+    const updated = createNote({ title: 'Новые планы' })
+
+    store.updateNote(updated)
+    updated.todos[0]!.text = 'Изменено после сохранения'
+
+    expect(store.noteById(updated.id)?.todos[0]?.text).toBe('Сходить в музей')
   })
 
   it('returns false when updating an unknown note', () => {

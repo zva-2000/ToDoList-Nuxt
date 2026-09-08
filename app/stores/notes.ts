@@ -1,42 +1,14 @@
 import { defineStore } from 'pinia'
-import type { Note, Todo } from '~/types/notes'
+import type { Note } from '~/types/notes'
+import { cloneNote, cloneNotes } from '~/utils/noteClone'
 
 interface NotesState {
   notes: Note[]
 }
 
-function cloneTodo(todo: Todo): Todo {
-  return { ...todo }
-}
-
-function cloneNote(note: Note): Note {
-  return {
-    ...note,
-    todos: note.todos.map(cloneTodo)
-  }
-}
-
-const demoNotes: Note[] = [
-  {
-    id: 'demo-weekend',
-    title: 'Планы на выходные',
-    todos: [
-      { id: 'demo-weekend-1', text: 'Сходить в музей', completed: false },
-      { id: 'demo-weekend-2', text: 'Купить продукты', completed: true }
-    ]
-  },
-  {
-    id: 'demo-work',
-    title: 'Рабочие задачи',
-    todos: [
-      { id: 'demo-work-1', text: 'Подготовить отчёт', completed: false }
-    ]
-  }
-]
-
 export const useNotesStore = defineStore('notes', {
   state: (): NotesState => ({
-    notes: demoNotes.map(cloneNote)
+    notes: []
   }),
 
   getters: {
@@ -46,6 +18,10 @@ export const useNotesStore = defineStore('notes', {
   },
 
   actions: {
+    replaceNotes(notes: Note[]): void {
+      this.notes = cloneNotes(notes)
+    },
+
     addNote(note: Note): void {
       if (this.noteById(note.id)) {
         throw new Error(`Заметка с id "${note.id}" уже существует`)
