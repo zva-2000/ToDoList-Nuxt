@@ -23,5 +23,5 @@ export function getHistoryShortcut(event: HistoryShortcutEvent): HistoryShortcut
 export function shouldUseNativeFieldHistory(target: EventTarget | null): boolean {
   return typeof HTMLElement !== 'undefined'
     && target instanceof HTMLElement
-    && target.id === NEW_TODO_FIELD_ID
+    && (target.matches('input, textarea') || target.isContentEditable)
 }

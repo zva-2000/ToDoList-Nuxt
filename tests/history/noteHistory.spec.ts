@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import type { NoteOperation } from '../../app/types/history'
 import type { Note } from '../../app/types/notes'
 import {
   clearNoteHistory,
@@ -107,8 +108,13 @@ describe('note history', () => {
 
     expect(history.past).toHaveLength(50)
     expect(history.past[0]).toMatchObject({ previous: '5', next: '6' })
-    expect(history.past.every((operation: any) => !('note' in operation))).toBe(true)
-    expect(history.past.every((operation: any) => !('todos' in operation))).toBe(true)
+
+    const operations: NoteOperation[] = history.past
+
+    for (const operation of operations) {
+      expect('note' in operation).toBe(false)
+      expect('todos' in operation).toBe(false)
+    }
   })
 
   it('stores its own todo snapshot and can be cleared', () => {
